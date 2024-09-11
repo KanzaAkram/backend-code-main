@@ -1,12 +1,11 @@
 const express = require("express");
-const bodyParser = require("body-parser");
-const authRoutes = require("./routes/authRoutes");
 const app = express();
+const authRoutes = require("./routes/authRoutes"); // Adjust path as necessary
+const db = require("./config/db"); // Ensure this imports your database connection module
 
-app.use(bodyParser.json());
-app.use("/api/auth", authRoutes);
+app.use(express.json()); // For parsing application/json
+app.use("/api", authRoutes); // Prefix for your routes
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(3000, () => {
+  console.log("Server running on port 3000");
 });
