@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const mysql = require("mysql2");
 const transporter = require("../config/nodemailer");
 const { hashPassword, comparePassword } = require("../utils/hashPassword");
+const jwt = require("jsonwebtoken");
 
 // Create a MySQL connection pool
 const pool = mysql.createPool({
@@ -62,13 +63,7 @@ exports.signup = async (req, res) => {
       .promise()
       .query(
         "INSERT INTO users (username, email, password, email_verified, verification_code) VALUES (?, ?, ?, ?, ?)",
-        [
-          username,
-          email,
-          hashedPassword,
-          false,
-          verificationCode,
-        ]
+        [username, email, hashedPassword, false, verificationCode]
       );
 
     // Send verification email
@@ -120,10 +115,18 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "Email not verified" });
     }
 
-    // Respond with user details
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: user.id, username: user.username, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" } // Token expiration time
+    );
+
+    // Respond with user details and token
     res.status(200).json({
       username: user.username,
       verification_code: user.verification_code, // Include as needed
+      token, // Include JWT token in response
     });
   } catch (err) {
     console.error("Login error:", err); // Log detailed error
@@ -162,7 +165,6 @@ exports.verifyEmail = async (req, res) => {
     res.status(500).json({ message: "Database error", error: err });
   }
 };
-
 
 // Resend verification email
 exports.resendVerificationEmail = (req, res) => {
