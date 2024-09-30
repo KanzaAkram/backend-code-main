@@ -8,6 +8,7 @@ const newUserRoutes = require("./routes/NewUserRoutes");
 const userTypeRoutes = require("./routes/UserTypeRoutes");
 const roleRoutes = require('./routes/roleRoutes'); // Import the role routes
 const orgRoutes = require("./routes/orgRoutes");
+const deviceRoutes = require("./routes/deviceRoutes");
 
 app.use(express.json()); // For parsing application/json
 
@@ -19,6 +20,7 @@ app.use("/api/users", newUserRoutes); // Routes related to users
 app.use("/api/user-types", userTypeRoutes); // Routes related to user types
 app.use('/api', roleRoutes); // Register role routes under /api
 app.use("/api", orgRoutes);
+app.use("/api/devices", deviceRoutes);
 
 // Start the server
 app.listen(3000, () => {
